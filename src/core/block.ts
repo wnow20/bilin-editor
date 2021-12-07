@@ -1,6 +1,5 @@
-import { nanoid } from 'nanoid'
+import {nanoid} from 'nanoid'
 import omit from "../utils/omit";
-import debounce from "../utils/debounce";
 import {Paragraph, ParagraphOptions} from "../components/paragraph";
 
 export interface BlockConstructorOptions {

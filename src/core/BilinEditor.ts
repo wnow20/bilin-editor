@@ -1,4 +1,4 @@
-import Block from "./block";
+import BlockManager from "./BlockManager";
 
 export interface OutputBlock {
     type: string;
@@ -18,14 +18,14 @@ export interface EditorOptions {
 
 export default class BilinEditor {
     private holder: HTMLElement;
-    private blockInstances: Block[];
     private options: EditorOptions;
-    private blocksWrapper: HTMLDivElement;
+    private blockManager: BlockManager;
 
     constructor(state: OutputData, options: EditorOptions) {
         this.options = options;
         this.initHolder();
-        this.render(state);
+        this.init(state);
+        this.render();
     }
 
     private initHolder() {
@@ -36,32 +36,18 @@ export default class BilinEditor {
             holder = document.querySelector(this.options.holder);
         }
         this.holder = holder;
-        let blocksWrapper = document.createElement('div');
-        blocksWrapper.classList.add('bl-blocks');
-        holder.append(blocksWrapper);
-        this.blocksWrapper = blocksWrapper;
     }
 
-    render(outputData: OutputData) {
-        const blockInstances: Block[] = [];
-
-        outputData.blocks.forEach((block: OutputBlock) => {
-            let blockInstance = new Block({
-                type: 'paragraph',
-                state: {
-                    ...block
-                }
-            });
-
-            this.blocksWrapper.append(blockInstance.holder);
-            blockInstances.push(blockInstance);
-        })
-        this.blockInstances = blockInstances;
+    render(): void {
+        const blocksWrapper = this.blockManager.render();
+        this.holder.append(blocksWrapper);
     }
 
     getState() {
-        return this.blockInstances.map(blockInstance => {
-            return blockInstance.state;
-        })
+        return this.blockManager.getState();
+    }
+
+    private init(state: OutputData) {
+        this.blockManager = new BlockManager(state);
     }
 }
