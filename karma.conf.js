@@ -6,6 +6,7 @@ module.exports = function(config) {
     files: [{ pattern: './tests/unit/spec-bundle.js', watched: false }],
     preprocessors: { './tests/unit/spec-bundle.js': ['webpack', 'sourcemap'] },
     webpack: {
+      devtool: 'inline-source-map',
       module: webpackConf.module,
       resolve: webpackConf.resolve
     },
