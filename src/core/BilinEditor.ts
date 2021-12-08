@@ -19,7 +19,7 @@ export interface EditorOptions {
 export default class BilinEditor {
     private holder: HTMLElement;
     private options: EditorOptions;
-    private blockManager: BlockManager;
+    blockManager: BlockManager;
 
     constructor(state: OutputData, options: EditorOptions) {
         this.options = options;

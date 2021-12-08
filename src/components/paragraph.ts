@@ -28,7 +28,7 @@ export class Paragraph {
         const wrapper = document.createElement('div');
         wrapper.classList.add("bl-paragraph");
         wrapper.contentEditable = 'true';
-        wrapper.innerHTML = this.text;
+        wrapper.innerHTML = this.text || '';
         this.wrapper = wrapper;
         return this.wrapper;
     }
