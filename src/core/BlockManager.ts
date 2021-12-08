@@ -24,6 +24,7 @@ class BlockManager {
             });
 
             this.holder.append(blockInstance.holder);
+            // to listen [contentEditable="true"] elements change
             const observer = new MutationObserver((mutationRecords) => {
                 debounce(() => {
 
