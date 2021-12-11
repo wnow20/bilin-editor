@@ -1,7 +1,7 @@
 # BilinEditor
 
 ### TODOs
- - split text when Enter keydown invoke between the text;
+ - join current paragraph rest contents into previous block when Backspace keydown
  - autofocus
  - undo/redo
  - shortcuts
