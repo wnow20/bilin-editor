@@ -37,33 +37,49 @@ describe('BilinEditor Tests with element holder in options', () => {
 });
 
 describe("BilinEditor handle Enter Keydown", () => {
-    const editorHolder = document.createElement('div');
-    editorHolder.id = 'BilinEditor_handle_Enter_Keydown'
-    document.body.append(editorHolder)
-
-    const bilinEditor = new BilinEditor({
-        blocks: [{
-            type: 'paragraph',
-            text: '123',
-        }],
-        version: 'v0',
-        timestamp: (new Date()).getTime(),
-    }, {
-        holder: editorHolder,
-    });
-
     it('should focus block correctly', async () => {
+        const editorHolder = document.createElement('div');
+        editorHolder.id = 'BilinEditor_handle_Enter_Keydown'
+        document.body.append(editorHolder)
+
+        const bilinEditor = new BilinEditor({
+            blocks: [{
+                type: 'paragraph',
+                text: '123',
+            }],
+            version: 'v0',
+            timestamp: (new Date()).getTime(),
+        }, {
+            holder: editorHolder,
+        });
+
         let firstBlock = bilinEditor.blockManager.getFirstBlock();
         firstBlock?.focus();
         expect(window.getSelection().anchorNode).toEqual(firstBlock.holder.firstChild);
     })
 
     it('should insert new default block when enter omit at the end of block', async () => {
+
+        const editorHolder = document.createElement('div');
+        editorHolder.id = 'BilinEditor_handle_Enter_Keydown'
+        document.body.append(editorHolder)
+
+        const bilinEditor = new BilinEditor({
+            blocks: [{
+                type: 'paragraph',
+                text: '123',
+            }],
+            version: 'v0',
+            timestamp: (new Date()).getTime(),
+        }, {
+            holder: editorHolder,
+        });
+
         let lastBlock = bilinEditor.blockManager.getLastBlock();
         lastBlock?.focus();
         let prevCount = bilinEditor.blockManager.blockCount();
         expect(window.getSelection().anchorNode).toEqual(lastBlock.holder.firstChild);
-        bilinEditor.blockManager.createDefaultBlockAfterCurrent();
+        lastBlock.split();
         let currentCount = bilinEditor.blockManager.blockCount();
 
         lastBlock = bilinEditor.blockManager.getLastBlock();
@@ -72,6 +88,46 @@ describe("BilinEditor handle Enter Keydown", () => {
         expect(lastBlock.state).withContext("lastBlock is the new block").toEqual({
             type: 'paragraph',
             text: '',
+        })
+    })
+
+    it('should insert new default block with text content when keydown middle a paragraph', async () => {
+
+        const editorHolder = document.createElement('div');
+        editorHolder.id = 'BilinEditor_handle_Enter_Keydown'
+        document.body.append(editorHolder)
+
+        const bilinEditor = new BilinEditor({
+            blocks: [{
+                type: 'paragraph',
+                text: '123',
+            }],
+            version: 'v0',
+            timestamp: (new Date()).getTime(),
+        }, {
+            holder: editorHolder,
+        });
+
+        let lastBlock = bilinEditor.blockManager.getLastBlock();
+        lastBlock?.focus();
+        let prevCount = bilinEditor.blockManager.blockCount();
+        expect(window.getSelection().anchorNode).toEqual(lastBlock.holder.firstChild);
+        let selection = getSelection();
+        selection.removeAllRanges();
+        let range = document.createRange();
+        let textNode = lastBlock.holder.firstElementChild.firstChild;
+        range.setStart(textNode, 2);
+        range.setStart(textNode, 2);
+        selection.addRange(range);
+
+        lastBlock.split();
+
+        let currentCount = bilinEditor.blockManager.blockCount();
+        lastBlock = bilinEditor.blockManager.getLastBlock();
+        expect(currentCount).withContext("block count not match").toEqual(prevCount + 1);
+        expect(lastBlock.state).withContext("lastBlock is the new block").toEqual({
+            type: 'paragraph',
+            text: '3',
         })
     })
 })

@@ -20,7 +20,8 @@ class BlockManager {
                 type: 'paragraph',
                 state: {
                     ...block
-                }
+                },
+                blockManager: this,
             });
 
             this.holder.append(blockInstance.holder);
@@ -29,12 +30,6 @@ class BlockManager {
                 debounce(() => {
 
                 }, 100);
-            });
-            blockInstance.holder.addEventListener('keydown', (event: KeyboardEvent) => {
-                if (event.code === 'Enter') {
-                    event.preventDefault();
-                    this.createDefaultBlockAfterCurrent();
-                }
             });
             observer.observe(blockInstance.holder, {
                 childList: true,
@@ -47,16 +42,6 @@ class BlockManager {
         this.blockInstances = blockInstances;
 
         return this.holder;
-    }
-
-    createDefaultBlockAfterCurrent() {
-        const newBlock = new Block({
-            type: 'paragraph',
-            state: {},
-        });
-        this.blockInstances.push(newBlock);
-        this.appendBlock(newBlock);
-        this.focus(newBlock);
     }
 
     private initHolder() {
@@ -75,8 +60,8 @@ class BlockManager {
         this.holder.append(block.holder);
     }
 
-    private focus(block: Block) {
-        block.focus();
+    focus(block: Block, index?: number) {
+        block.focus(index);
     }
 
     getLastBlock(): Block | undefined {
@@ -94,6 +79,44 @@ class BlockManager {
 
     blockCount() {
         return this.blockInstances.length;
+    }
+
+    createBlockAfter(param: { state: { text: string }; type: string }, block: Block) {
+        let newBlock = new Block({
+            ...param,
+            blockManager: this,
+        });
+
+        block.holder.insertAdjacentElement("afterend", newBlock.holder);
+        let index = this.blockInstances.indexOf(block);
+        this.blockInstances.splice(index + 1, 0, newBlock);
+        return newBlock;
+    }
+
+    createBlockBefore(param: { state: {}; type: string }, block: Block) {
+        let newBlock = new Block({
+            ...param,
+            blockManager: this,
+        });
+
+        block.holder.insertAdjacentElement("beforebegin", newBlock.holder);
+        let index = this.blockInstances.indexOf(block);
+        this.blockInstances.splice(index - 1, 0, newBlock);
+        return newBlock;
+    }
+
+    removeBlock(block: Block) {
+        let index = this.blockInstances.findIndex(value => block);
+        this.blockInstances.splice(index, 1);
+        block.destroy();
+    }
+
+    focusPreviousBlock(block: Block) {
+        let blockIndex = this.blockInstances.findIndex(value => value === block);
+        if (blockIndex - 1 >= 0) {
+            let previousBlock = this.blockInstances[blockIndex - 1];
+            this.focus(previousBlock);
+        }
     }
 }
 
