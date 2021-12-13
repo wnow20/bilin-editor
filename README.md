@@ -1,7 +1,8 @@
 # BilinEditor
 
 ### TODOs
- - join current paragraph rest contents into previous block when Backspace keydown
+ - caret walk test
+ - caret walk bad path, eg: index overflow element's text length
  - autofocus
  - undo/redo
  - shortcuts

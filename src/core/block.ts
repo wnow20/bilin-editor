@@ -2,23 +2,13 @@ import {nanoid} from 'nanoid'
 import omit from "../utils/omit";
 import {Paragraph, ParagraphOptions} from "../components/paragraph";
 import BlockManager from "./BlockManager";
+import {createNodeRange, getCurrentInputBox} from "../utils/doms";
 
 export interface BlockConstructorOptions {
     id?: string;
     type: string;
     state: any;
     blockManager: BlockManager,
-}
-
-function getCurrentInputBox(node: Node): HTMLElement {
-    if (node instanceof HTMLElement) {
-        let ele: HTMLElement = node;
-        if (ele.contentEditable) {
-            return ele;
-        }
-        return getCurrentInputBox(ele.parentElement);
-    }
-    return getCurrentInputBox(node.parentElement);
 }
 
 class Block {
@@ -87,6 +77,22 @@ class Block {
                 this._handleBackspaceDown();
             }
         }
+        if (event.code === 'ArrowUp') {
+            event.preventDefault();
+            this._handleArrowUp();
+        }
+        if (event.code === 'ArrowDown') {
+            event.preventDefault();
+            this._handleArrowDown();
+        }
+    }
+
+    _handleArrowUp() {
+        this.blockManager.focusPreviousBlock(this);
+    }
+
+    _handleArrowDown() {
+        this.blockManager.focusNextBlock(this);
     }
 
     _handleBackspaceDown() {
@@ -168,7 +174,7 @@ class Block {
     focus(index?: number) {
         const selection = window.getSelection();
         const isEmptyElement = this._blockDom.innerHTML === '';
-        const range = document.createRange();
+        let range = document.createRange();
         selection.removeAllRanges();
 
         if (isEmptyElement) {
@@ -183,11 +189,25 @@ class Block {
                 range.setEnd(this._blockDom, this._blockDom.childNodes.length);
                 // range.selectNodeContents(this._blockDom);
                 selection.addRange(range);
+                return;
             }
             if (index === 0) {
                 range.setStart(this._blockDom.firstChild, 0);
                 range.setEnd(this._blockDom.firstChild, 0);
                 selection.addRange(range);
+                return;
+            }
+
+            if (index === -1) {
+                return;
+            }
+
+            range = createNodeRange(this._blockDom, {count: index}, null);
+            if (range) {
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                return;
             }
         }
     }

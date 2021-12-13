@@ -2,15 +2,19 @@ import {OutputBlock, OutputData} from "./BilinEditor";
 import Block from "./block";
 import debounce from "../utils/debounce";
 import {createShadowCaret, focusShadowCaretAndClean} from "../utils/caret";
+import CaretWalker from "./CaretWalker";
+import {getSelectionCharacterOffsetWithin} from "../utils/doms";
 
 class BlockManager {
     private holder: HTMLDivElement;
     private _state: OutputData;
     private blockInstances: Block[];
+    private caretWalker: CaretWalker;
 
     constructor(state: OutputData) {
         this._state = state;
         this.initHolder();
+        this.caretWalker = new CaretWalker();
     }
 
     render() {
@@ -49,6 +53,15 @@ class BlockManager {
         let blocksWrapper = document.createElement('div');
         blocksWrapper.classList.add('bl-blocks');
         this.holder = blocksWrapper;
+        this.holder.addEventListener('keydown', (event) => {
+            if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
+                this.caretWalker.changeOffset(null);
+            }
+        })
+    }
+
+    get caretWalkOffset() {
+        return this.caretWalker.getOffset();
     }
 
     getState() {
@@ -116,7 +129,20 @@ class BlockManager {
         let blockIndex = this.blockInstances.findIndex(value => value === block);
         if (blockIndex - 1 >= 0) {
             let previousBlock = this.blockInstances[blockIndex - 1];
-            this.focus(previousBlock);
+
+            let index = this.caretWalkOffset != null ? this.caretWalkOffset : getSelectionCharacterOffsetWithin(block.holder).end;
+            this.caretWalker.changeOffset(index);
+            this.focus(previousBlock, index);
+        }
+    }
+
+    focusNextBlock(block: Block) {
+        let blockIndex = this.blockInstances.findIndex(value => value === block);
+        if (blockIndex + 1 <= this.blockInstances.length) {
+            let nextBlock = this.blockInstances[blockIndex + 1];
+            let index = this.caretWalkOffset != null ? this.caretWalkOffset : getSelectionCharacterOffsetWithin(block.holder).end;
+            this.caretWalker.changeOffset(index);
+            this.focus(nextBlock, index);
         }
     }
 
