@@ -47,6 +47,12 @@ class Block {
         };
     }
 
+    set state(nextState: any) {
+        if (this.type === 'paragraph') {
+            this.blockInstance.state = nextState;
+        }
+    }
+
     get holder() {
         return this._holder;
     }
@@ -73,17 +79,25 @@ class Block {
     onKeydown = (event: KeyboardEvent) => {
         if (event.code === 'Enter') {
             event.preventDefault();
-            if (this.isAtStartOfCurrentBlock()) {
-                this.insertDefaultBlockBefore()
-            } else {
-                this.split();
-            }
+            this._handleEnterDown();
         }
         if (event.code === 'Backspace') {
             if (this.isAtStartOfCurrentBlock()) {
-                this.blockManager.focusPreviousBlock(this);
-                this.blockManager.removeBlock(this);
+                event.preventDefault();
+                this._handleBackspaceDown();
             }
+        }
+    }
+
+    _handleBackspaceDown() {
+        this.blockManager.mergeToPrevious(this);
+    }
+
+    _handleEnterDown() {
+        if (this.isAtStartOfCurrentBlock()) {
+            this.insertDefaultBlockBefore()
+        } else {
+            this.split();
         }
     }
 
@@ -165,14 +179,14 @@ class Block {
         } else {
             if (index === undefined) {
                 // Range API refer to https://developer.mozilla.org/zh-CN/docs/Web/API/Range
-                range.setStart(this._blockDom, 1);
-                range.setEnd(this._blockDom, 1);
+                range.setStart(this._blockDom, this._blockDom.childNodes.length);
+                range.setEnd(this._blockDom, this._blockDom.childNodes.length);
                 // range.selectNodeContents(this._blockDom);
                 selection.addRange(range);
             }
             if (index === 0) {
-                range.setStart(this._blockDom, 0);
-                range.setEnd(this._blockDom, 0);
+                range.setStart(this._blockDom.firstChild, 0);
+                range.setEnd(this._blockDom.firstChild, 0);
                 selection.addRange(range);
             }
         }
@@ -181,6 +195,25 @@ class Block {
     destroy() {
         this.holder.removeEventListener('keydown', this.onKeydown);
         this.holder.remove();
+    }
+
+    // TODO generic type
+    mergeState(state: { text: string; type: string }) {
+        const targetState = this.state;
+        let isMatch = targetState.type === state.type;
+        if (!isMatch) {
+            return;
+        }
+
+        const mergedState = {};
+        Object.entries(omit(state, 'type')).forEach(([key, value]) => {
+            if (targetState.hasOwnProperty(key)) {
+                mergedState[key] = targetState[key] + value;
+            } else {
+                mergedState[key] = value;
+            }
+        });
+        this.state = mergedState;
     }
 }
 

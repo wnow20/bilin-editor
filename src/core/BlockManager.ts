@@ -1,6 +1,7 @@
 import {OutputBlock, OutputData} from "./BilinEditor";
 import Block from "./block";
 import debounce from "../utils/debounce";
+import {createShadowCaret, focusShadowCaretAndClean} from "../utils/caret";
 
 class BlockManager {
     private holder: HTMLDivElement;
@@ -106,7 +107,7 @@ class BlockManager {
     }
 
     removeBlock(block: Block) {
-        let index = this.blockInstances.findIndex(value => block);
+        let index = this.blockInstances.findIndex(value => value === block);
         this.blockInstances.splice(index, 1);
         block.destroy();
     }
@@ -117,6 +118,23 @@ class BlockManager {
             let previousBlock = this.blockInstances[blockIndex - 1];
             this.focus(previousBlock);
         }
+    }
+
+    mergeToPrevious(block: Block) {
+        const blockIndex = this.blockInstances.findIndex(value => value === block);
+        if (blockIndex === 0) {
+            return;
+        }
+        const previous = this.blockInstances[blockIndex - 1];
+
+        createShadowCaret();
+        previous.mergeState(block.state);
+        let shadowCaret = previous.holder.querySelector('.shadow-caret');
+        focusShadowCaretAndClean(shadowCaret);
+        previous.holder.normalize();
+        // 规范化当前节点和它的后代节点，在一个"规范化"后的DOM树中，不存在一个空的文本节点，或者两个相邻的文本节点。
+        // 参考自：https://developer.mozilla.org/zh-CN/docs/Web/API/Node/normalize
+        this.removeBlock(block);
     }
 }
 

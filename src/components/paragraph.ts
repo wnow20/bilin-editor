@@ -24,6 +24,11 @@ export class Paragraph {
         };
     }
 
+    set state({text}: {text: string}) {
+        this.text = text;
+        this.wrapper.innerHTML = text;
+    }
+
     render() {
         const wrapper = document.createElement('div');
         wrapper.classList.add("bl-paragraph");
