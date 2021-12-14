@@ -202,7 +202,11 @@ class Block {
                 return;
             }
 
-            range = createNodeRange(this._blockDom, {count: index}, null);
+            let chars = {count: index};
+            range = createNodeRange(this._blockDom, chars, null);
+            if (chars.count !== 0) {
+                range.selectNodeContents(this._blockDom);
+            }
             if (range) {
                 range.collapse(false);
                 selection.removeAllRanges();
