@@ -1,12 +1,13 @@
 # BilinEditor
 
 ### TODOs
- - caret walk test
- - √ caret walk bad path, eg: index overflow element's text length
- - autofocus
- - undo/redo
- - shortcuts
- - slash commands
+- [x] caret walk test
+- [x] caret walk bad path, eg: index overflow element's text length
+- [] getCurrentBlock
+- [] autofocus
+- [] undo/redo
+- [] shortcuts
+- [] slash commands
 
 ### 编辑器核心竞争力
  - 客户开发体验好

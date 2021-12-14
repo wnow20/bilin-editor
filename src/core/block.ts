@@ -199,7 +199,7 @@ class Block {
             }
 
             if (index === -1) {
-                return;
+                index = this._blockDom.textContent.length;
             }
 
             let chars = {count: index};

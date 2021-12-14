@@ -277,4 +277,122 @@ describe("BilinEditor Tests with string holder in options", () => {
             text: '123',
         });
     })
-})
+});
+
+describe("Caret Walker in blocks", () => {
+    const editorHolder = document.createElement('div');
+    editorHolder.id = 'Caret_Walker_in_blocks'
+    document.body.append(editorHolder)
+
+    const bilinEditor = new BilinEditor({
+        blocks: [{
+            type: 'paragraph',
+            text: '123',
+        }, {
+            type: 'paragraph',
+            text: '',
+        }, {
+            type: 'paragraph',
+            text: '12311156',
+        }, {
+            type: 'paragraph',
+            text: '1231ab',
+        }],
+        version: 'v0',
+        timestamp: (new Date()).getTime(),
+    }, {
+        holder: '#Caret_Walker_in_blocks',
+    });
+
+    it('should walk caret in blocks correctly', () => {
+        let block1 = bilinEditor.blockManager.getLastBlock();
+        block1.focus(4);
+        bilinEditor.blockManager._handleEditorClickEvent();
+
+        let selection = getSelection();
+        expect(selection.focusNode.textContent).toEqual('1231ab');
+        expect(selection.focusOffset).toEqual(4);
+
+        block1._handleArrowUp();
+        selection = getSelection();
+        expect(selection.focusNode.textContent).withContext('focus third block with offset 4').toEqual('12311156');
+        expect(selection.focusOffset).withContext('focus third block with offset 4').toEqual(4);
+
+        block1 = bilinEditor.blockManager.getBlock(2);
+        block1._handleArrowUp();
+        selection = getSelection();
+        expect(selection.focusNode.textContent).withContext('focus second block with offset 0').toEqual('');
+        expect(selection.focusOffset).withContext('focus second block with offset 0').toEqual(0);
+
+        block1 = bilinEditor.blockManager.getBlock(1);
+        block1._handleArrowUp();
+        selection = getSelection();
+        expect(selection.focusNode.nodeType).withContext('first block\' focusNode.nodeType equal 3').toEqual(1);
+        expect((selection.focusNode as HTMLElement).classList).toContain('bl-paragraph');
+        expect(selection.focusNode.textContent).withContext('focus first block with offset 3').toEqual('123');
+        expect(selection.focusOffset).withContext('focus first block with offset 3').toEqual(1);
+    })
+
+    it('should walk caret through the first of every blocks', () => {
+        let block1 = bilinEditor.blockManager.getLastBlock();
+        block1.focus(0);
+        bilinEditor.blockManager._handleEditorClickEvent();
+
+        let selection = getSelection();
+        expect(selection.focusNode.textContent).toEqual('1231ab');
+        expect(selection.focusOffset).toEqual(0);
+
+        block1._handleArrowUp();
+        selection = getSelection();
+        expect(selection.focusNode.textContent).withContext('focus third block with offset 0').toEqual('12311156');
+        expect(selection.focusNode.nodeType).withContext('third block\' focusNode.nodeType equal 3').toEqual(3);
+        expect(selection.focusOffset).withContext('focus third block with offset 0').toEqual(0);
+
+        block1 = bilinEditor.blockManager.getBlock(2);
+        block1._handleArrowUp();
+        selection = getSelection();
+        expect(selection.focusNode.textContent).withContext('focus second block with offset 0').toEqual('');
+        expect((selection.focusNode as HTMLElement).classList).toContain('bl-paragraph');
+        expect(selection.focusNode.nodeType).withContext('second block\' focusNode.nodeType equal 3').toEqual(1);
+        expect(selection.focusOffset).withContext('focus second block with offset 0').toEqual(0);
+
+        block1 = bilinEditor.blockManager.getBlock(1);
+        block1._handleArrowUp();
+        selection = getSelection();
+        expect(selection.focusNode.nodeType).withContext('first block\' focusNode.nodeType equal 3').toEqual(3);
+        expect(selection.focusNode.textContent).withContext('focus first block with offset 3').toEqual('123');
+        expect(selection.focusOffset).withContext('focus first block with offset 3').toEqual(0);
+    })
+
+    it('should walk caret through the end of every blocks', () => {
+        let block1 = bilinEditor.blockManager.getLastBlock();
+        block1.focus(-1);
+        bilinEditor.blockManager._handleEditorClickEvent();
+
+        let selection = getSelection();
+        console.log(selection);
+        expect(selection.focusNode.textContent).toEqual('1231ab');
+        expect(selection.focusOffset).toEqual('1231ab'.length);
+
+        block1._handleArrowUp();
+        selection = getSelection();
+        expect(selection.focusNode.textContent).withContext('focus third block with offset 0').toEqual('12311156');
+        expect(selection.focusNode.nodeType).withContext('third block\' focusNode.nodeType equal 3').toEqual(3);
+        expect(selection.focusOffset).withContext('focus third block with offset 0').toEqual('12311156'.length);
+
+        block1 = bilinEditor.blockManager.getBlock(2);
+        block1._handleArrowUp();
+        selection = getSelection();
+        expect(selection.focusNode.textContent).withContext('focus second block with offset 0').toEqual('');
+        expect((selection.focusNode as HTMLElement).classList).toContain('bl-paragraph');
+        expect(selection.focusNode.nodeType).withContext('second block\' focusNode.nodeType equal 3').toEqual(1);
+        expect(selection.focusOffset).withContext('focus second block with offset 0').toEqual(0);
+
+        block1 = bilinEditor.blockManager.getBlock(1);
+        block1._handleArrowUp();
+        selection = getSelection();
+        expect(selection.focusNode.nodeType).withContext('first block\' focusNode.nodeType equal 3').toEqual(3);
+        expect(selection.focusNode.textContent).withContext('focus first block with offset 3').toEqual('123');
+        expect(selection.focusOffset).withContext('focus first block with offset 3').toEqual('123'.length);
+    })
+});

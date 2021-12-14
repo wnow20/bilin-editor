@@ -3,7 +3,7 @@ import Block from "./block";
 import debounce from "../utils/debounce";
 import {createShadowCaret, focusShadowCaretAndClean} from "../utils/caret";
 import CaretWalker from "./CaretWalker";
-import {getSelectionCharacterOffsetWithin} from "../utils/doms";
+import {getCurrentInputBox, getSelectionCharacterOffsetWithin} from "../utils/doms";
 
 class BlockManager {
     private holder: HTMLDivElement;
@@ -58,6 +58,23 @@ class BlockManager {
                 this.caretWalker.changeOffset(null);
             }
         })
+        this.holder.addEventListener('click', (event) => {
+            this._handleEditorClickEvent();
+        })
+    }
+
+    _handleEditorClickEvent() {
+        let selection = getSelection();
+        if (selection.type !== 'None') {
+            let currentInputBox = getCurrentInputBox(selection.focusNode);
+            if (currentInputBox) {
+                let selectionCharacterOffsetWithin = getSelectionCharacterOffsetWithin(currentInputBox);
+                if (selectionCharacterOffsetWithin) {
+                    let nextOffset = currentInputBox.textContent.length === selectionCharacterOffsetWithin.end ? -1 : selectionCharacterOffsetWithin.end;
+                    this.caretWalker.changeOffset(nextOffset);
+                }
+            }
+        }
     }
 
     get caretWalkOffset() {
@@ -80,15 +97,27 @@ class BlockManager {
 
     getLastBlock(): Block | undefined {
         if (this.blockInstances.length === 0) {
-            return ;
+            return;
         }
         return this.blockInstances[this.blockInstances.length - 1];
     }
+
     getFirstBlock(): Block | undefined {
         if (this.blockInstances.length === 0) {
-            return ;
+            return;
         }
         return this.blockInstances[0];
+    }
+
+    getBlock(index: number): Block | undefined {
+        if (this.blockInstances.length === 0) {
+            return;
+        }
+        return this.blockInstances[index];
+    }
+
+    getCurrentBlock(): Block | undefined {
+        return ;
     }
 
     blockCount() {
