@@ -12,7 +12,7 @@ export interface BlockConstructorOptions {
 }
 
 class Block {
-    private readonly id: string;
+    readonly id: string;
     private type: string;
     private originalState: any;
     private _holder: HTMLElement;
@@ -50,6 +50,7 @@ class Block {
     private initHolder() {
         const holder = document.createElement('div');
         holder.classList.add('bl-block');
+        holder.dataset.id = this.id;
         this._holder = holder;
     }
 

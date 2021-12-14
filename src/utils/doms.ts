@@ -1,3 +1,19 @@
+export function bubbleQuery(node: Node, predicate: (node: Node) => boolean): Node {
+    if (node instanceof HTMLElement) {
+        if (predicate(node)) {
+            return node;
+        }
+    }
+    return bubbleQuery(node.parentElement, predicate);
+}
+
+export function getCurrentBlockId() {
+    let node = bubbleQuery(getSelection().focusNode, (node) => {
+        return node instanceof HTMLElement && node.classList.contains('bl-block') && !!node.dataset.id
+    });
+    return (node as HTMLElement).dataset.id;
+}
+
 export function getCurrentInputBox(node: Node): HTMLElement {
     if (node instanceof HTMLElement) {
         let ele: HTMLElement = node;
@@ -25,6 +41,14 @@ export function getSelectionCharacterOffsetWithin(element: Element) {
             end = preCaretRange.toString().length;
         }
     return { start: start, end: end };
+}
+
+export function focusCharacterOffset(element: Element, offset: number) {
+    let selection = getSelection();
+    let range = createNodeRange(element, {count: offset}, null);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
 }
 
 // refer to https://stackoverflow.com/a/41034697/4021637
@@ -56,4 +80,10 @@ export function createNodeRange(node: Node, chars: {count: number}, range: Range
         }
     }
     return range;
+}
+
+export function createFragment(domString: string) {
+    let template = document.createElement('template');
+    template.innerHTML = domString;
+    return document.importNode(template.content, true);
 }

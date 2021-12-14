@@ -3,8 +3,9 @@
 ### TODOs
 - [x] caret walk test
 - [x] caret walk bad path, eg: index overflow element's text length
-- [] getCurrentBlock
+- [x] blockManager#getCurrentBlock
 - [] autofocus
+- [] copy/paste
 - [] undo/redo
 - [] shortcuts
 - [] slash commands

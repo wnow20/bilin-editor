@@ -3,7 +3,7 @@ import Block from "./block";
 import debounce from "../utils/debounce";
 import {createShadowCaret, focusShadowCaretAndClean} from "../utils/caret";
 import CaretWalker from "./CaretWalker";
-import {getCurrentInputBox, getSelectionCharacterOffsetWithin} from "../utils/doms";
+import {getCurrentBlockId, getCurrentInputBox, getSelectionCharacterOffsetWithin} from "../utils/doms";
 
 class BlockManager {
     private holder: HTMLDivElement;
@@ -116,8 +116,16 @@ class BlockManager {
         return this.blockInstances[index];
     }
 
+    getBlockById(blockId: string): Block | undefined {
+        let blocks = this.blockInstances.filter(value => {
+            return value.id === blockId;
+        });
+        return blocks && blocks.length ? blocks[0] : undefined;
+    }
+
     getCurrentBlock(): Block | undefined {
-        return ;
+        let currentBlockId = getCurrentBlockId();
+        return this.getBlockById(currentBlockId);
     }
 
     blockCount() {

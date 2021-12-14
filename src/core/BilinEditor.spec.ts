@@ -370,7 +370,6 @@ describe("Caret Walker in blocks", () => {
         bilinEditor.blockManager._handleEditorClickEvent();
 
         let selection = getSelection();
-        console.log(selection);
         expect(selection.focusNode.textContent).toEqual('1231ab');
         expect(selection.focusOffset).toEqual('1231ab'.length);
 
