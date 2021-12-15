@@ -10,12 +10,12 @@
 - [] shortcuts
 - [] slash commands
 
-### 编辑器核心竞争力
- - 客户开发体验好
- - 方便扩展
- - bug少
- - 文档全面、细致
- - 有比较好的社区生态、比较活跃的社区贡献
+### Top Competitiveness of The Good Editor - 编辑器核心竞争力
+ - Client Develop friendly - 客户开发体验好
+ - Easy to extend - 方便扩展
+ - less bug As few as possible - Bug少 
+ - Friendly and progressive documentation - 友好的、渐进式的、可实践的文档
+ - active community and contribution - 有比较好的社区生态、比较活跃的社区贡献
 
 ### Contributes
 #### How to start
