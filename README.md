@@ -1,4 +1,5 @@
 # BilinEditor
+A new good choice of block editor in browsers.
 
 ### TODOs
 - [x] caret walk test
