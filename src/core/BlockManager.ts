@@ -4,17 +4,21 @@ import debounce from "../utils/debounce";
 import {createShadowCaret, focusShadowCaretAndClean} from "../utils/caret";
 import CaretWalker from "./CaretWalker";
 import {getCurrentBlockId, getCurrentInputBox, getSelectionCharacterOffsetWithin} from "../utils/doms";
+import ActionPipe from "./ActionPipe";
+import {Action} from "./Action";
 
 class BlockManager {
     private holder: HTMLDivElement;
     private _state: OutputData;
     private blockInstances: Block[];
     private caretWalker: CaretWalker;
+    readonly changePipe: ActionPipe<Action<any>>;
 
     constructor(state: OutputData) {
         this._state = state;
         this.initHolder();
         this.caretWalker = new CaretWalker();
+        this.changePipe = new ActionPipe<Action<any>>();
     }
 
     render() {
@@ -32,15 +36,18 @@ class BlockManager {
             this.holder.append(blockInstance.holder);
             // to listen [contentEditable="true"] elements change
             const observer = new MutationObserver((mutationRecords) => {
+                console.log(mutationRecords);
                 debounce(() => {
 
                 }, 100);
             });
             observer.observe(blockInstance.holder, {
+                attributeOldValue: true,
+                attributes: true,
+                characterData: true,
+                characterDataOldValue: true,
                 childList: true,
                 subtree: true,
-                characterData: true,
-                attributes: true,
             });
             blockInstances.push(blockInstance);
         });

@@ -3,6 +3,7 @@ import omit from "../utils/omit";
 import {Paragraph, ParagraphOptions} from "../components/paragraph";
 import BlockManager from "./BlockManager";
 import {createNodeRange, getCurrentInputBox} from "../utils/doms";
+import debounce from "../utils/debounce";
 
 export interface BlockConstructorOptions {
     id?: string;
@@ -64,16 +65,46 @@ class Block {
             this._blockDom = blockDom;
 
             this.holder.addEventListener('keydown', this.onKeydown);
+            this.holder.addEventListener('input', (ev: InputEvent) => {
+                if (ev.isComposing || !ev.data) {
+                    return;
+                }
+                this.pushInputAction(ev);
+            })
+            this.holder.addEventListener('compositionstart', (event: CompositionEvent) => {
+            });
+            this.holder.addEventListener('compositionend', (event: CompositionEvent) => {
+                this.blockManager.changePipe.push({
+                    type: 'input',
+                    text: event.data
+                });
+            });
+            this.holder.addEventListener('paste', (e: ClipboardEvent) => {
+                let data = e.clipboardData.getData('Text');
+                this.blockManager.changePipe.push({
+                    type: 'input',
+                    text: data,
+                });
+            });
         }
     }
+
+    pushInputAction = debounce((event: InputEvent) => {
+        this.blockManager.changePipe.push({
+            type: 'input',
+            data: event.data,
+        })
+    }, 100);
 
     onKeydown = (event: KeyboardEvent) => {
         if (event.code === 'Enter') {
             event.preventDefault();
-            this._handleEnterDown();
+            if (!event.isComposing) {
+                this._handleEnterDown();
+            }
         }
         if (event.code === 'Backspace') {
-            if (this.isAtStartOfCurrentBlock()) {
+            if (this.isAtStartOfCurrentBlock() && getSelection().type === 'Caret') {
                 event.preventDefault();
                 this._handleBackspaceDown();
             }
@@ -170,7 +201,7 @@ class Block {
         s.addRange(r);
         document.execCommand('delete', false, null);
 
-        refer to https://www.py4u.net/discuss/906393
+        refer from https://www.py4u.net/discuss/906393
      */
     focus(index?: number) {
         const selection = window.getSelection();
@@ -185,7 +216,7 @@ class Block {
             document.execCommand('delete', false, null);
         } else {
             if (index === undefined) {
-                // Range API refer to https://developer.mozilla.org/zh-CN/docs/Web/API/Range
+                // Range API refer from https://developer.mozilla.org/zh-CN/docs/Web/API/Range
                 range.setStart(this._blockDom, this._blockDom.childNodes.length);
                 range.setEnd(this._blockDom, this._blockDom.childNodes.length);
                 // range.selectNodeContents(this._blockDom);

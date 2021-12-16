@@ -3,10 +3,10 @@ interface FoldedPipeOptions<T> {
     initialValue?: T[];
 }
 
-class FoldedPipe<T> {
+class ActionPipe<T> {
     private readonly stack: T[];
     private readonly foldedStack: T[];
-    private _maxLength: number;
+    private readonly _maxLength: number;
 
     constructor({ maxLength = 20, initialValue }: FoldedPipeOptions<T> = {}) {
         this._maxLength = maxLength;
@@ -17,12 +17,13 @@ class FoldedPipe<T> {
     push(item: T) {
         this.stack.push(item);
         if (this.foldedStack.length > 0) {
-            // refer to https://stackoverflow.com/a/1234337/4021637
+            // refer from https://stackoverflow.com/a/1234337/4021637
             this.foldedStack.length = 0;
         }
         if (this.stack.length > this._maxLength) {
             this.stack.shift();
         }
+        console.log(this.stack);
     }
 
     backward() {
@@ -44,4 +45,4 @@ class FoldedPipe<T> {
     }
 }
 
-export default FoldedPipe;
+export default ActionPipe;

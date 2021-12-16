@@ -24,7 +24,7 @@ export function getCurrentInputBox(node: Node): HTMLElement {
     }
     return getCurrentInputBox(node.parentElement);
 }
-// refer to https://stackoverflow.com/a/4812022/4021637
+// refer from https://stackoverflow.com/a/4812022/4021637
 export function getSelectionCharacterOffsetWithin(element: Element) {
     let start = 0;
     let end = 0;
@@ -51,7 +51,7 @@ export function focusCharacterOffset(element: Element, offset: number) {
     selection.addRange(range);
 }
 
-// refer to https://stackoverflow.com/a/41034697/4021637
+// refer from https://stackoverflow.com/a/41034697/4021637
 export function createNodeRange(node: Node, chars: {count: number}, range: Range) {
     if (!range) {
         range = document.createRange()
