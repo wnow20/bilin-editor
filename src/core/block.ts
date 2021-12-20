@@ -271,6 +271,10 @@ class Block {
         });
         this.state = mergedState;
     }
+
+    isEmpty() {
+        return this.holder.textContent.length === 0;
+    }
 }
 
 export default Block;

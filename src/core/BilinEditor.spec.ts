@@ -251,6 +251,37 @@ describe("BilinEditor handle Enter Keydown", () => {
             text: 'mergeBlock\'s toMerge',
         });
     })
+
+    it('should remove empty block and focus previous block when backspace keydown as a empty block', () => {
+        const editorHolder = document.createElement('div');
+        editorHolder.id = 'BilinEditor_handle_Backspace_Keydown_at_the_first_of_the_first_block'
+        document.body.append(editorHolder)
+
+        const bilinEditor = new BilinEditor({
+            blocks: [{
+                type: 'paragraph',
+                text: 'text,',
+            }, {
+                type: 'paragraph',
+                text: '',
+            }],
+            version: 'v0',
+            timestamp: (new Date()).getTime(),
+        }, {
+            holder: editorHolder,
+        });
+
+        let emptyBlock = bilinEditor.blockManager.getBlock(1);
+        emptyBlock.focus();
+        emptyBlock._handleBackspaceDown();
+
+        let firstBlock = bilinEditor.blockManager.getFirstBlock();
+        let selection = getSelection();
+        expect(bilinEditor.blockManager.blockCount()).toEqual(1);
+        expect(selection.type).toEqual('Caret');
+        expect(selection.getRangeAt(0).endContainer).toEqual(firstBlock.holder.firstChild);
+        expect((selection.getRangeAt(0).endContainer as HTMLElement).classList).toContain('bl-paragraph');
+    });
 })
 
 describe("BilinEditor Tests with string holder in options", () => {

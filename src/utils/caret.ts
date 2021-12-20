@@ -23,7 +23,9 @@ export function createShadowCaret() {
         if (childNode instanceof Text) {
             selection.focusNode.insertBefore(shadowCaret, childNode);
         }
-
+        if (selection.focusOffset === 0 && childNode === undefined) {
+            rangeAt.endContainer.prepend(shadowCaret);
+        }
     }
     return shadowCaret;
 }

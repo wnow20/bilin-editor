@@ -17,7 +17,7 @@ describe('Util Debounce Tests', () => {
 });
 
 async function waits(time: number) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         setTimeout(() => {
             resolve();
         }, time)

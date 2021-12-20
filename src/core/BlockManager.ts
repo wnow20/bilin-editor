@@ -196,7 +196,12 @@ class BlockManager {
             return;
         }
         const previous = this.blockInstances[blockIndex - 1];
-
+        if (block.isEmpty()) {
+            this.removeBlock(block);
+            previous.focus();
+            return;
+        }
+        // TODO make sure two block can merge
         createShadowCaret();
         previous.mergeState(block.state);
         let shadowCaret = previous.holder.querySelector('.shadow-caret');
