@@ -6,5 +6,6 @@ export type Action<T> = {
 } & Command;
 
 
-type TextAction = Action<{ text: string, blockId: string }>;
-type BlockInsertAction = Action<{ text: string, blockId: string }>;
+export type InsertTextAction = Action<{ type: 'insertText', text: string, blockId: string }>;
+export type ImageAction = Action<{ type: 'img', url: string, blockId: string }>;
+export type BlockInsertAction = Action<{ text: string, blockId: string }>;

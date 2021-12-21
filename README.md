@@ -5,11 +5,12 @@ A new good choice of block editor in browsers.
 - [x] caret walk test
 - [x] caret walk bad path, eg: index overflow element's text length
 - [x] blockManager#getCurrentBlock
-- [] autofocus
-- [] copy/paste
 - [] undo/redo
+- [] copy/paste
+- [] collaborative
 - [] shortcuts
 - [] slash commands
+- [] autofocus
 
 ### Top Competitiveness of The Good Editor - 编辑器核心竞争力
  - Client Develop friendly - 客户开发体验好

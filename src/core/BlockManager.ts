@@ -4,21 +4,22 @@ import debounce from "../utils/debounce";
 import {createShadowCaret, focusShadowCaretAndClean} from "../utils/caret";
 import CaretWalker from "./CaretWalker";
 import {getCurrentBlockId, getCurrentInputBox, getSelectionCharacterOffsetWithin} from "../utils/doms";
-import ActionPipe from "./ActionPipe";
-import {Action} from "./Action";
+import Pipe from "./Pipe";
+import {Action, InsertTextAction} from "./Action";
+import {isMac, isWin} from "./userAgent";
 
 class BlockManager {
     private holder: HTMLDivElement;
     private _state: OutputData;
     private blockInstances: Block[];
     private caretWalker: CaretWalker;
-    readonly changePipe: ActionPipe<Action<any>>;
+    readonly changePipe: Pipe<Action<any>>;
 
     constructor(state: OutputData) {
         this._state = state;
         this.initHolder();
         this.caretWalker = new CaretWalker();
-        this.changePipe = new ActionPipe<Action<any>>();
+        this.changePipe = new Pipe<Action<any>>();
     }
 
     render() {
@@ -51,6 +52,19 @@ class BlockManager {
             });
             blockInstances.push(blockInstance);
         });
+        this.holder.addEventListener('keydown', (event) => {
+            if ((event.code === 'KeyZ' && event.ctrlKey && isWin)
+                || (event.code === 'KeyZ' && event.metaKey && isMac)) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                let backward: Action<any> = this.changePipe.backward();
+                console.log("backward", backward);
+                if (backward.type) {
+                    let insertTextAction = backward as InsertTextAction;
+                }
+            }
+        })
         this.blockInstances = blockInstances;
 
         return this.holder;

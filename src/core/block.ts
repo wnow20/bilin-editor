@@ -69,32 +69,61 @@ class Block {
                 if (ev.isComposing || !ev.data) {
                     return;
                 }
+                console.log('input', this.state);
                 this.pushInputAction(ev);
             })
             this.holder.addEventListener('compositionstart', (event: CompositionEvent) => {
             });
             this.holder.addEventListener('compositionend', (event: CompositionEvent) => {
+                console.log("compositionend")
                 this.blockManager.changePipe.push({
-                    type: 'input',
+                    type: 'insertText',
                     text: event.data
                 });
             });
             this.holder.addEventListener('paste', (e: ClipboardEvent) => {
+                console.log("paste")
                 let data = e.clipboardData.getData('Text');
                 this.blockManager.changePipe.push({
-                    type: 'input',
+                    type: 'insertText',
                     text: data,
                 });
             });
         }
     }
 
-    pushInputAction = debounce((event: InputEvent) => {
-        this.blockManager.changePipe.push({
-            type: 'input',
-            data: event.data,
+    pushInputAction(ev: InputEvent) {
+        let selection = getSelection();
+        selection.isCollapsed;
+
+        this.blockManager.changePipe.debouncePush({
+            type: 'insertText',
+            text: ev.data,
+            selection: {
+                isCollapsed: selection.isCollapsed,
+                isBackward: selection.focusNode === selection.getRangeAt(0).startContainer,
+                focusNode: selection.focusNode,
+                type: selection.type,
+                range: {
+                    startOffset: selection.getRangeAt(0).startOffset,
+                    endOffset: selection.getRangeAt(0).startOffset,
+                }
+            },
+            blockId: this.id,
+        }, (prev, curr) => {
+            if (prev.type !== curr.type) {
+                return false;
+            }
+
+            if (prev.type === 'insertText') {
+                return {
+                    ...prev,
+                    ...curr,
+                    text: prev.text + curr.text,
+                };
+            }
         })
-    }, 100);
+    };
 
     onKeydown = (event: KeyboardEvent) => {
         if (event.code === 'Enter') {
