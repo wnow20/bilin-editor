@@ -66,6 +66,7 @@ class Block {
 
             this.holder.addEventListener('keydown', this.onKeydown);
             this.holder.addEventListener('input', (ev: InputEvent) => {
+                // ev.inputType === 'deleteContentBackward'
                 if (ev.isComposing || !ev.data) {
                     return;
                 }

@@ -58,10 +58,43 @@ class BlockManager {
                 event.preventDefault();
                 event.stopPropagation();
 
+                if (event.shiftKey) {
+                    let forward = this.changePipe.forward();
+                    console.log("forward", forward);
+
+                    if (forward && forward.type) {
+                        if (forward.type === 'insertText') {
+                            let data = forward.selection.focusNode.data;
+
+                            forward.selection.focusNode.data = data + forward.text;
+
+                            let selection = getSelection();
+                            selection.removeAllRanges();
+                            let range = document.createRange();
+                            range.setStart(forward.selection.focusNode, forward.selection.focusNode.data.length);
+                            range.setEnd(forward.selection.focusNode, forward.selection.focusNode.data.length);
+                            selection.addRange(range);
+                        }
+                    }
+                    return ;
+                }
+
                 let backward: Action<any> = this.changePipe.backward();
                 console.log("backward", backward);
-                if (backward.type) {
-                    let insertTextAction = backward as InsertTextAction;
+                if (backward && backward.type) {
+                    if (backward.type === 'insertText') {
+                        let data = backward.selection.focusNode.data;
+
+                        backward.selection.focusNode.data = data.substring(0, data.length - backward.text.length);
+
+                        let selection = getSelection();
+                        selection.removeAllRanges();
+                        let range = document.createRange();
+                        range.setStart(backward.selection.focusNode, backward.selection.range.endOffset - backward.text.length);
+                        range.setEnd(backward.selection.focusNode, backward.selection.range.endOffset - backward.text.length);
+                        selection.addRange(range);
+                    }
+
                 }
             }
         })
